@@ -11,6 +11,7 @@ app = FastAPI()
 bot = PdfQA()
 emb = EMB_OPENAI_ADA
 llm = LLM_OPENAI_GPT35
+load_in_8bit = False
 
 
 class Question(BaseModel):
@@ -58,8 +59,21 @@ async def trainModel():
 @app.get('/api/ask')
 async def askQuery(question:Question):
     try:
+        bot = PdfQA() # Remove this for chat history
+        bot.config = {
+            "pdf_path": str('B1'),
+            "embedding": emb,
+            "llm": llm,
+            "load_in_8bit": load_in_8bit
+        }
+        bot.embedding = load_emb(emb)
+        bot.llm = load_llm(llm,load_in_8bit)        
+        bot.init_embeddings()
+        bot.init_models()
         bot.retreival_qa_chain()
+        # question = question + " Provide 5-7 key points on it with explaination and example."
         answer = bot.answer_query(question.question)
+        
         return {"msg":"Answer Generated Successfully!!!","question":question.question,"answer":answer}
     except:
         return {"msg":"Internal Server Error!!!"}
