@@ -8,4 +8,6 @@ PyPDF2
 faiss-cpu
 tiktoken
 chromadb
+fastapi
+uvicorn
 
